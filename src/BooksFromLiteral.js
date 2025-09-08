@@ -1,75 +1,122 @@
 import React, { useEffect, useState } from "react";
+import "./BooksFromLiteral.css";
 
-function BooksFromLiteral() {
-  const [books, setBooks] = useState([]);
+const STATUS_LABELS = {
+  IS_READING: "Currently Reading",
+  FINISHED: "Finished Reading",
+  WANTS_TO_READ: "Want to Read",
+};
+
+const STATUS_ORDER = ["IS_READING", "FINISHED", "WANTS_TO_READ"];
+
+export default function BooksFromLiteral() {
+  const [readingStates, setReadingStates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Paste your token here (for testing only; don't share publicly)
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9maWxlSWQiOiJjbDZzZG8yYWIxMTc3NzMwaHlsMmEwa2Vtam8iLCJ0eXBlIjoiQUNDRVNTX1RPS0VOIiwidGltZXN0YW1wIjoxNzU3MzQ3NDQzMTIyLCJpYXQiOjE3NTczNDc0NDMsImV4cCI6MTc3MzA3MjI0M30.kW_gzNttA1t5_Ag7MDD--7WIAVDZAJd0jFZPedkzIp0";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9maWxlSWQiOiJjbDZzZG8yYWIxMTc3NzMwaHlsMmEwa2Vtam8iLCJ0eXBlIjoiQUNDRVNTX1RPS0VOIiwidGltZXN0YW1wIjoxNzU3MzQ3NDQzMTIyLCJpYXQiOjE3NTczNDc0NDMsImV4cCI6MTc3MzA3MjI0M30.kW_gzNttA1t5_Ag7MDD--7WIAVDZAJd0jFZPedkzIp0"; // paste your token here
 
     fetch("https://literal.club/graphql/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `
-          query myBooks {
-            myBooks {
+          query myReadingStates {
+            myReadingStates {
               id
-              title
-              cover
-              authors { name }
+              status
+              book {
+                id
+                slug
+                title
+                cover
+                authors { id name }
+              }
             }
           }
         `,
       }),
     })
-      .then(res => res.json())
-      .then(data => {
-        setBooks(data.data.myBooks);
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.errors) {
+          setError("Failed to fetch books. Check your token.");
+        } else {
+          setReadingStates(data.data.myReadingStates || []);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Network error.");
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <div>Loading books...</div>;
+  // Group books by status
+  const booksByStatus = STATUS_ORDER.map(status => ({
+    status,
+    label: STATUS_LABELS[status],
+    books: readingStates
+      .filter(rs => rs.status === status)
+      .map(rs => rs.book)
+      .filter(Boolean)
+  }));
+
+  if (loading) return <div className="books-loading">Loading books...</div>;
+  if (error) return <div className="books-error">{error}</div>;
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-      gap: "2rem",
-      padding: "2rem"
-    }}>
-      {books.map(book => (
-        <div key={book.id} style={{
-          background: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px #0001",
-          padding: "1rem",
-          textAlign: "center"
-        }}>
-          <img
-            src={book.cover}
-            alt={book.title}
-            style={{
-              width: "100%",
-              height: "240px",
-              objectFit: "cover",
-              borderRadius: "6px",
-              marginBottom: "1rem"
-            }}
-          />
-          <h3 style={{ margin: "0 0 0.5rem 0" }}>{book.title}</h3>
-          <p style={{ margin: 0, color: "#555" }}>
-            {book.authors.map(a => a.name).join(", ")}
-          </p>
-        </div>
+    <div className="books-page" style={{ maxWidth: 1200, margin: "0 auto", padding: "3rem 2rem 2rem 2rem" }}>
+      {booksByStatus.map(({ status, label, books }, idx) => (
+        <section key={status} style={{ marginBottom: "3.5rem" }}>
+          <h2 style={{
+            fontSize: "1.5rem",
+            fontWeight: 600,
+            marginBottom: "1.2rem",
+            letterSpacing: "0.01em"
+          }}>
+            {label}
+          </h2>
+          <div className="books-row">
+            {books.length === 0 ? (
+              <div style={{ color: "#bbb", fontSize: "1.1rem", margin: "2rem 0" }}>No books in this category.</div>
+            ) : (
+              books.map((book, idx) => (
+                <a
+                  key={book.id}
+                  href={`https://literal.club/book/${book.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="book-link"
+                  style={{ "--i": idx }}
+                  title={book.title}
+                >
+                  <img
+                    src={book.cover}
+                    alt={book.title}
+                    className="book-cover"
+                  />
+                  <div className="book-title">{book.title}</div>
+                  <div className="book-authors">
+                    {(book.authors || []).map((a) => a.name).join(", ")}
+                  </div>
+                </a>
+              ))
+            )}
+          </div>
+          {idx < booksByStatus.length - 1 && (
+            <hr style={{
+              border: "none",
+              borderTop: "1.5px solid #eee",
+              margin: "2.5rem 0 0.5rem 0"
+            }} />
+          )}
+        </section>
       ))}
     </div>
   );
 }
-
-export default BooksFromLiteral;
