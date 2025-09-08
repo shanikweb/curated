@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 
 export default function Sidebar() {
   const location = useLocation();
+  const [theme, setTheme] = useState(() => document.documentElement.getAttribute('data-theme') || 'light');
+
+  useEffect(() => {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    setTheme(current);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    setTheme(next);
+  };
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
         <Link to="/" className="sidebar-title">Shanik Tanna</Link>
-        <div className="sidebar-sub">Curated Picks</div>
+        <div className="sidebar-sub">garden of curation</div>
         <nav className="nav">
           <Link to="/" className={location.pathname === "/" ? "active" : ""}>Books</Link>
           <Link to="/movies" className={location.pathname === "/movies" ? "active" : ""}>Movies</Link>
@@ -18,6 +31,9 @@ export default function Sidebar() {
           <Link to="/tabs" className={location.pathname === "/tabs" ? "active" : ""}>Tabs</Link>
         </nav>
         <div className="sidebar-footer">
+          <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle dark mode">
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
           <span>creative producer &amp; community builder</span>
         </div>
       </div>

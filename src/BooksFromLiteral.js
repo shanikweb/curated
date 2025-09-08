@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { gsap } from "gsap";
 import "./BooksFromLiteral.css";
 
 const STATUS_LABELS = {
@@ -13,6 +14,10 @@ export default function BooksFromLiteral() {
   const [readingStates, setReadingStates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("IS_READING"); // start on Currently Reading
+  const gridRef = useRef(null);
+
+  // No plugin registration needed; using plain GSAP for crossfades
 
   useEffect(() => {
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9maWxlSWQiOiJjbDZzZG8yYWIxMTc3NzMwaHlsMmEwa2Vtam8iLCJ0eXBlIjoiQUNDRVNTX1RPS0VOIiwidGltZXN0YW1wIjoxNzU3MzQ3NDQzMTIyLCJpYXQiOjE3NTczNDc0NDMsImV4cCI6MTc3MzA3MjI0M30.kW_gzNttA1t5_Ag7MDD--7WIAVDZAJd0jFZPedkzIp0"; // paste your token here
@@ -56,115 +61,86 @@ export default function BooksFromLiteral() {
       });
   }, []);
 
-  // Group books by status
-  const booksByStatus = STATUS_ORDER.map(status => ({
-    status,
-    label: STATUS_LABELS[status],
-    books: readingStates
-      .filter(rs => rs.status === status)
-      .map(rs => rs.book)
+  // Prepare flattened list with status for filtering
+  const allBooks = useMemo(() => (
+    readingStates
+      .map(rs => ({ ...rs.book, _status: rs.status }))
       .filter(Boolean)
-  }));
+  ), [readingStates]);
 
-  // Attach scroll listeners to toggle edge fades precisely
-  useEffect(() => {
-    const wraps = Array.from(document.querySelectorAll('.books-row-wrap'));
+  const visibleBooks = useMemo(() => (
+    filter === "ALL" ? allBooks : allBooks.filter(b => b._status === filter)
+  ), [allBooks, filter]);
 
-    const updateForWrap = (wrap) => {
-      const row = wrap.querySelector('.books-row');
-      if (!row) return;
-      const maxScroll = row.scrollWidth - row.clientWidth;
-      if (maxScroll <= 1) {
-        wrap.classList.remove('show-left', 'show-right');
-        return;
-      }
-      const atStart = row.scrollLeft <= 2;
-      const atEnd = row.scrollLeft >= maxScroll - 2;
-      wrap.classList.toggle('show-left', !atStart);
-      wrap.classList.toggle('show-right', !atEnd);
-    };
-
-    const onScroll = (e) => {
-      const wrap = e.currentTarget.parentElement;
-      if (wrap) updateForWrap(wrap);
-    };
-
-    // init and bind
-    // Use rAF to ensure DOM is painted before measuring
-    const init = () => {
-      wraps.forEach((wrap) => {
-        const row = wrap.querySelector('.books-row');
-        if (!row) return;
-        updateForWrap(wrap);
-        row.addEventListener('scroll', onScroll, { passive: true });
-      });
-    };
-    if (typeof requestAnimationFrame !== 'undefined') {
-      requestAnimationFrame(init);
-    } else {
-      setTimeout(init, 0);
-    }
-
-    // also respond to window resize
-    const onResize = () => wraps.forEach(updateForWrap);
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      wraps.forEach((wrap) => {
-        const row = wrap.querySelector('.books-row');
-        if (!row) return;
-        row.removeEventListener('scroll', onScroll);
-      });
-      window.removeEventListener('resize', onResize);
-    };
-  }, [readingStates]);
+  // Remove previous scroll hint logic — simplified grid crossfade
 
   if (loading) return <div className="books-loading">Loading books...</div>;
   if (error) return <div className="books-error">{error}</div>;
 
   return (
     <div className="books-page">
-      {booksByStatus.map(({ status, label, books }, idx) => (
-        <section key={status} className="books-section">
-          <h2 className="books-section-title">{label}</h2>
-          <div className="books-row-wrap">
-            <div className="edge-fade left" aria-hidden="true" />
-            <div className="edge-fade right" aria-hidden="true" />
-            <div className="scroll-hint" aria-hidden="true">
-              <span className="scroll-hint-text">Swipe</span>
-              <span className="scroll-hint-arrows">››</span>
-            </div>
-            <div className="books-row">
-              {books.length === 0 ? (
-                <div className="books-empty">No books in this category.</div>
-              ) : (
-                books.map((book, idx) => (
-                  <a
-                  key={book.id}
-                  href={`https://literal.club/book/${book.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="book-link"
-                  style={{ "--i": idx }}
-                  title={book.title}
-                >
-                  <img
-                    src={book.cover}
-                    alt={book.title}
-                    className="book-cover"
-                  />
-                  <div className="book-title">{book.title}</div>
-                  <div className="book-authors">
-                    {(book.authors || []).map((a) => a.name).join(", ")}
-                  </div>
-                </a>
-              ))
-            )}
-            </div>
-          </div>
-          {idx < booksByStatus.length - 1 && <hr className="books-divider" />}
-        </section>
-      ))}
+      <div className="books-toolbar" role="tablist" aria-label="Filter books">
+        {[
+          { key: "IS_READING", label: STATUS_LABELS.IS_READING },
+          { key: "FINISHED", label: STATUS_LABELS.FINISHED },
+          { key: "WANTS_TO_READ", label: STATUS_LABELS.WANTS_TO_READ },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={filter === key}
+            className={`chip ${filter === key ? "active" : ""}`}
+            onClick={() => {
+              if (key === filter) return;
+              const nextFilter = key;
+              const grid = gridRef.current;
+              if (!grid) { setFilter(nextFilter); return; }
+              // Cancel any in-flight tweens to avoid stacking animations
+              gsap.killTweensOf(grid);
+              gsap.to(grid, {
+                opacity: 0,
+                y: 8,
+                scale: 0.995,
+                duration: 0.2,
+                ease: "power2.out",
+                onComplete: () => {
+                  setFilter(nextFilter);
+                  requestAnimationFrame(() => {
+                    gsap.fromTo(
+                      grid,
+                      { opacity: 0, y: 8, scale: 0.985 },
+                      { opacity: 1, y: 0, scale: 1, duration: 0.26, ease: "power2.out" }
+                    );
+                  });
+                }
+              });
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="books-grid" ref={gridRef}>
+        {(visibleBooks.length === 0) ? (
+          <div className="books-empty">No books in this filter.</div>
+        ) : (
+          visibleBooks.map((book) => (
+            <a
+              key={book.id}
+              href={`https://literal.club/book/${book.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="book-link"
+              title={book.title}
+              data-status={book._status}
+            >
+              <img src={book.cover} alt={book.title} className="book-cover" />
+              <div className="book-title">{book.title}</div>
+              <div className="book-authors">{(book.authors || []).map(a => a.name).join(", ")}</div>
+            </a>
+          ))
+        )}
+      </div>
     </div>
   );
 }

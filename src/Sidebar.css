@@ -1,7 +1,7 @@
 .sidebar {
   width: 260px;
   min-height: 100vh;
-  background: #faf7f2;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -10,8 +10,8 @@
   left: 0;
   top: 0;
   bottom: 0;
-  border-right: 1px solid #eee;
-  padding: 2rem 1.25rem;
+  border-right: 1px solid var(--divider);
+  padding: 2rem 2rem; /* add more inner breathing room */
 }
 
 .sidebar-content {
@@ -26,12 +26,12 @@
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.2px;
-  color: #222;
+  color: var(--ink);
   text-decoration: none;
 }
 
 .sidebar-sub {
-  color: #888;
+  color: var(--muted);
   font-size: 0.95rem;
 }
 
@@ -44,7 +44,7 @@
 
 .nav a {
   text-decoration: none;
-  color: #333;
+  color: var(--ink);
   font-size: 1rem;
   font-weight: 500;
   padding: 0.25rem 0.5rem 0.25rem 0.75rem;
@@ -53,26 +53,36 @@
   border-radius: 2px;
 }
 
-.nav a.active {
-  color: #2a5db0;
-  border-left-color: #2a5db0;
-  background: #f0f4fa;
-}
+.nav a.active { color: var(--primary); border-left-color: var(--primary); background: var(--accent-bg); }
 
 .nav a:hover { color: #2a5db0; }
 
 .nav-divider {
   height: 1px;
   width: 100%;
-  background: #eee;
+  background: var(--divider);
   margin: 0.5rem 0;
 }
 
 .sidebar-footer {
   font-size: 0.95rem;
-  color: #888;
+  color: var(--muted);
   margin-top: auto;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.theme-toggle {
+  appearance: none;
+  background: var(--accent-bg);
+  color: var(--ink);
+  border: 1px solid var(--divider);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  align-self: flex-start;
 }
 
 /* Main content spacing relative to sidebar */
@@ -89,7 +99,7 @@
     min-height: auto;
     padding: 1rem 1rem 0.5rem;
     border-right: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--divider);
   }
 
   .sidebar-content { gap: 0.5rem; }

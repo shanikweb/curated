@@ -1,0 +1,46 @@
+:root {
+  --page-max-width: 1180px;
+  --bg: #faf7f2;
+  --ink: #222;
+  --muted: #777;
+  --primary: #2a5db0;
+  --accent-bg: #f0f4fa;
+  --divider: #ece8e2;
+}
+
+[data-theme="dark"] {
+  --bg: #111213;
+  --ink: #e9e9eb;
+  --muted: #a7a7ad;
+  --primary: #8bb4ff;
+  --accent-bg: #172033;
+  --divider: #26282b;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-shell {
+  background: var(--bg);
+}
+
+.main {
+  margin-left: 260px;
+  flex: 1;
+  padding: 3.5rem clamp(24px, 6vw, 84px) 2.5rem;
+}
+
+@media (max-width: 900px) {
+  .main {
+    margin-left: 0;
+    padding: 2rem clamp(16px, 5vw, 32px) 2rem;
+  }
+}
