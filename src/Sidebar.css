@@ -4,57 +4,74 @@
   background: #faf7f2;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center; /* vertical centering */
+  align-items: flex-start;
+  justify-content: flex-start;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   border-right: 1px solid #eee;
+  padding: 2rem 1.25rem;
 }
 
 .sidebar-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
+  align-items: flex-start;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .sidebar-title {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 2rem;
+  letter-spacing: 0.2px;
   color: #222;
+  text-decoration: none;
 }
 
-.sidebar nav {
+.sidebar-sub {
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.nav {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  align-items: center;
+  gap: 0.6rem;
+  align-items: flex-start;
 }
 
-.sidebar nav a {
+.nav a {
   text-decoration: none;
-  color: #444;
-  font-size: 1.2rem;
+  color: #333;
+  font-size: 1rem;
   font-weight: 500;
-  transition: color 0.2s;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+  border-left: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  border-radius: 2px;
 }
 
-.sidebar nav a.active,
-.sidebar nav a:hover {
+.nav a.active {
   color: #2a5db0;
+  border-left-color: #2a5db0;
   background: #f0f4fa;
+}
+
+.nav a:hover { color: #2a5db0; }
+
+.nav-divider {
+  height: 1px;
+  width: 100%;
+  background: #eee;
+  margin: 0.5rem 0;
 }
 
 .sidebar-footer {
   font-size: 0.95rem;
   color: #888;
-  margin-top: 2rem;
+  margin-top: auto;
   text-align: center;
 }
 
@@ -75,15 +92,13 @@
     border-bottom: 1px solid #eee;
   }
 
-  .sidebar-content { gap: 1rem; }
-  .sidebar-title { font-size: 1.5rem; margin-bottom: 0; }
+  .sidebar-content { gap: 0.5rem; }
+  .sidebar-title { font-size: 1.35rem; margin-bottom: 0; }
 
-  .sidebar nav {
-    flex-direction: row;
-    gap: 1rem;
-  }
+  .nav { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
+  .nav a { border-left: none; padding-left: 0.25rem; }
 
-  .sidebar-footer { margin-top: 0.5rem; }
+  .sidebar-footer { margin-top: 0.5rem; align-self: flex-start; }
 
   .main {
     margin-left: 0;

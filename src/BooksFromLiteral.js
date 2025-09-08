@@ -66,6 +66,59 @@ export default function BooksFromLiteral() {
       .filter(Boolean)
   }));
 
+  // Attach scroll listeners to toggle edge fades precisely
+  useEffect(() => {
+    const wraps = Array.from(document.querySelectorAll('.books-row-wrap'));
+
+    const updateForWrap = (wrap) => {
+      const row = wrap.querySelector('.books-row');
+      if (!row) return;
+      const maxScroll = row.scrollWidth - row.clientWidth;
+      if (maxScroll <= 1) {
+        wrap.classList.remove('show-left', 'show-right');
+        return;
+      }
+      const atStart = row.scrollLeft <= 2;
+      const atEnd = row.scrollLeft >= maxScroll - 2;
+      wrap.classList.toggle('show-left', !atStart);
+      wrap.classList.toggle('show-right', !atEnd);
+    };
+
+    const onScroll = (e) => {
+      const wrap = e.currentTarget.parentElement;
+      if (wrap) updateForWrap(wrap);
+    };
+
+    // init and bind
+    // Use rAF to ensure DOM is painted before measuring
+    const init = () => {
+      wraps.forEach((wrap) => {
+        const row = wrap.querySelector('.books-row');
+        if (!row) return;
+        updateForWrap(wrap);
+        row.addEventListener('scroll', onScroll, { passive: true });
+      });
+    };
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(init);
+    } else {
+      setTimeout(init, 0);
+    }
+
+    // also respond to window resize
+    const onResize = () => wraps.forEach(updateForWrap);
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      wraps.forEach((wrap) => {
+        const row = wrap.querySelector('.books-row');
+        if (!row) return;
+        row.removeEventListener('scroll', onScroll);
+      });
+      window.removeEventListener('resize', onResize);
+    };
+  }, [readingStates]);
+
   if (loading) return <div className="books-loading">Loading books...</div>;
   if (error) return <div className="books-error">{error}</div>;
 

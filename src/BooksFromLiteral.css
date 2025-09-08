@@ -59,15 +59,15 @@
   bottom: 0;
   width: 56px;
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0;
   transition: opacity 0.25s ease;
 }
-.edge-fade.left { left: 0; background: linear-gradient(to right, var(--bg), rgba(250,247,242,0)); opacity: 0; }
+.edge-fade.left { left: 0; background: linear-gradient(to right, var(--bg), rgba(250,247,242,0)); }
 .edge-fade.right { right: 0; background: linear-gradient(to left, var(--bg), rgba(250,247,242,0)); }
 
-/* On hover/focus, reveal left fade too to suggest continuation */
-.books-row-wrap:hover .edge-fade.left,
-.books-row-wrap:focus-within .edge-fade.left { opacity: 0.85; }
+/* Show fades only when applicable */
+.books-row-wrap.show-left .edge-fade.left { opacity: 0.85; }
+.books-row-wrap.show-right .edge-fade.right { opacity: 0.85; }
 
 .book-link {
   display: flex;
