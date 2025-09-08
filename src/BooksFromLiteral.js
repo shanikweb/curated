@@ -70,20 +70,13 @@ export default function BooksFromLiteral() {
   if (error) return <div className="books-error">{error}</div>;
 
   return (
-    <div className="books-page" style={{ maxWidth: 1200, margin: "0 auto", padding: "3rem 2rem 2rem 2rem" }}>
+    <div className="books-page">
       {booksByStatus.map(({ status, label, books }, idx) => (
-        <section key={status} style={{ marginBottom: "3.5rem" }}>
-          <h2 style={{
-            fontSize: "1.5rem",
-            fontWeight: 600,
-            marginBottom: "1.2rem",
-            letterSpacing: "0.01em"
-          }}>
-            {label}
-          </h2>
+        <section key={status} className="books-section">
+          <h2 className="books-section-title">{label}</h2>
           <div className="books-row">
             {books.length === 0 ? (
-              <div style={{ color: "#bbb", fontSize: "1.1rem", margin: "2rem 0" }}>No books in this category.</div>
+              <div className="books-empty">No books in this category.</div>
             ) : (
               books.map((book, idx) => (
                 <a
@@ -108,13 +101,7 @@ export default function BooksFromLiteral() {
               ))
             )}
           </div>
-          {idx < booksByStatus.length - 1 && (
-            <hr style={{
-              border: "none",
-              borderTop: "1.5px solid #eee",
-              margin: "2.5rem 0 0.5rem 0"
-            }} />
-          )}
+          {idx < booksByStatus.length - 1 && <hr className="books-divider" />}
         </section>
       ))}
     </div>

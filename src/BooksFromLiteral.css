@@ -1,57 +1,94 @@
-.books-page {
-  /* already set in JS for maxWidth and margin */
+:root {
+  --page-max-width: 1180px;
+  --bg: #faf7f2;
+  --ink: #222;
+  --muted: #888;
+  --primary: #2a5db0;
+  --accent-bg: #f0f4fa;
+  --divider: #eee;
+  --radius: 12px;
+  --cover-w: 180px;
+  --cover-h: 260px;
+  --gap: 1.25rem;
 }
 
-.books-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 3.5rem 2.5rem;
-  justify-items: center;
-  align-items: start;
-  margin-bottom: 0.5rem;
+.books-page {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 3rem 2rem 2rem;
 }
+
+.books-section {
+  margin-bottom: 3.25rem;
+}
+
+.books-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0 0 1rem 0;
+  color: var(--ink);
+}
+
+/* Horizontal row like a portfolio strip */
+.books-row {
+  position: relative;
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 0.25rem 0.5rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbars for a cleaner look */
+.books-row::-webkit-scrollbar { display: none; }
+.books-row { scrollbar-width: none; }
 
 .book-link {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: #222;
+  color: var(--ink);
   transition: transform 0.18s cubic-bezier(.4,2,.6,1), box-shadow 0.18s;
   will-change: transform;
   background: none;
   box-shadow: none;
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: var(--cover-w);
 }
 
 .book-link:hover {
-  transform: translateY(-8px) scale(1.04);
-  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.07);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 10px 30px 0 rgba(0,0,0,0.08);
 }
 
 .book-cover {
   width: 100%;
-  max-width: 180px;
-  height: 260px;
+  height: var(--cover-h);
   object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 1.1rem;
+  border-radius: var(--radius);
+  margin-bottom: 0.9rem;
   background: #eee;
   box-shadow: 0 2px 12px #0001;
   transition: box-shadow 0.18s;
 }
 
 .book-title {
-  font-size: 1.13rem;
+  font-size: 1.05rem;
   font-weight: 500;
   text-align: center;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.25rem;
   margin-top: 0;
   letter-spacing: 0.01em;
 }
 
 .book-authors {
   font-size: 1rem;
-  color: #888;
+  color: var(--muted);
   text-align: center;
   margin-bottom: 0;
 }
@@ -60,5 +97,35 @@
 .books-error {
   text-align: center;
   margin-top: 2rem;
-  color: #888;
+  color: var(--muted);
+}
+
+.books-empty {
+  color: #bbb;
+  font-size: 1.05rem;
+  margin: 1.5rem 0;
+}
+
+.books-divider {
+  border: none;
+  border-top: 1.5px solid var(--divider);
+  margin: 2rem 0 0.25rem 0;
+}
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  :root {
+    --cover-w: 160px;
+    --cover-h: 232px;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --cover-w: 140px;
+    --cover-h: 204px;
+  }
+  .books-section-title {
+    font-size: 1.25rem;
+  }
 }
