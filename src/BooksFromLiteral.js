@@ -1,14 +1,11 @@
-// src/App.js
 import React, { useEffect, useState } from "react";
 
-// --- Book Grid Component ---
 function BooksFromLiteral() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Paste your token here (keep private!)
+    // Paste your token here (for testing only; don't share publicly)
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9maWxlSWQiOiJjbDZzZG8yYWIxMTc3NzMwaHlsMmEwa2Vtam8iLCJ0eXBlIjoiQUNDRVNTX1RPS0VOIiwidGltZXN0YW1wIjoxNzU3MzQ3NDQzMTIyLCJpYXQiOjE3NTczNDc0NDMsImV4cCI6MTc3MzA3MjI0M30.kW_gzNttA1t5_Ag7MDD--7WIAVDZAJd0jFZPedkzIp0";
 
     fetch("https://literal.club/graphql/", {
@@ -32,21 +29,12 @@ function BooksFromLiteral() {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.errors) {
-          setError("Failed to fetch books. Check your token.");
-        } else {
-          setBooks(data.data.myBooks);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Network error.");
+        setBooks(data.data.myBooks);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <div style={{ textAlign: "center", marginTop: "2rem" }}>Loading books...</div>;
-  if (error) return <div style={{ color: "red", textAlign: "center", marginTop: "2rem" }}>{error}</div>;
+  if (loading) return <div>Loading books...</div>;
 
   return (
     <div style={{
@@ -71,8 +59,7 @@ function BooksFromLiteral() {
               height: "240px",
               objectFit: "cover",
               borderRadius: "6px",
-              marginBottom: "1rem",
-              background: "#eee"
+              marginBottom: "1rem"
             }}
           />
           <h3 style={{ margin: "0 0 0.5rem 0" }}>{book.title}</h3>
@@ -85,14 +72,4 @@ function BooksFromLiteral() {
   );
 }
 
-// --- Main App Component ---
-function App() {
-  return (
-    <div>
-      <h1 style={{ textAlign: "center", margin: "2rem 0" }}>My Books</h1>
-      <BooksFromLiteral />
-    </div>
-  );
-}
-
-export default App;
+export default BooksFromLiteral;
