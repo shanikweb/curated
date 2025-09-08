@@ -57,3 +57,35 @@
   margin-top: 2rem;
   text-align: center;
 }
+
+/* Main content spacing relative to sidebar */
+.main {
+  margin-left: 260px;
+  flex: 1;
+}
+
+/* Mobile layout: Sidebar becomes a top bar */
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+    padding: 1rem 1rem 0.5rem;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .sidebar-content { gap: 1rem; }
+  .sidebar-title { font-size: 1.5rem; margin-bottom: 0; }
+
+  .sidebar nav {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .sidebar-footer { margin-top: 0.5rem; }
+
+  .main {
+    margin-left: 0;
+  }
+}

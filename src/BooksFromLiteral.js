@@ -74,12 +74,19 @@ export default function BooksFromLiteral() {
       {booksByStatus.map(({ status, label, books }, idx) => (
         <section key={status} className="books-section">
           <h2 className="books-section-title">{label}</h2>
-          <div className="books-row">
-            {books.length === 0 ? (
-              <div className="books-empty">No books in this category.</div>
-            ) : (
-              books.map((book, idx) => (
-                <a
+          <div className="books-row-wrap">
+            <div className="edge-fade left" aria-hidden="true" />
+            <div className="edge-fade right" aria-hidden="true" />
+            <div className="scroll-hint" aria-hidden="true">
+              <span className="scroll-hint-text">Swipe</span>
+              <span className="scroll-hint-arrows">››</span>
+            </div>
+            <div className="books-row">
+              {books.length === 0 ? (
+                <div className="books-empty">No books in this category.</div>
+              ) : (
+                books.map((book, idx) => (
+                  <a
                   key={book.id}
                   href={`https://literal.club/book/${book.slug}`}
                   target="_blank"
@@ -100,6 +107,7 @@ export default function BooksFromLiteral() {
                 </a>
               ))
             )}
+            </div>
           </div>
           {idx < booksByStatus.length - 1 && <hr className="books-divider" />}
         </section>
