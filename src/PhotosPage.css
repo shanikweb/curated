@@ -1,0 +1,82 @@
+.photos-page {
+  max-width: 1440px; /* wider canvas for galleries */
+  margin: 0 auto;
+  padding: var(--top-pad) clamp(24px, 6vw, 84px) 2.5rem;
+}
+
+.photos-toolbar {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+/* chip styles now provided globally in theme.css */
+
+.projects-list { display: flex; flex-direction: column; gap: 3rem; }
+
+.project-row {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2.25rem;
+  align-items: start;
+  border-top: 1px solid var(--divider);
+  padding-top: 1.5rem;
+}
+
+.project-meta { display: flex; flex-direction: column; gap: .25rem; }
+.project-title { font-weight: 600; color: var(--ink); }
+.project-sub { color: var(--muted); font-size: .92rem; }
+
+.thumbs-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: .5rem;
+}
+
+.thumb {
+  appearance: none;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.thumb img {
+  width: 100%;
+  height: 110px;
+  display: block;
+  border-radius: 0; /* no rounded corners on thumbnails */
+  object-fit: cover;
+  transform: translateZ(0);
+  transition: transform .15s ease;
+}
+.thumb:hover img { transform: scale(1.035); }
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.lb-image { max-width: 90vw; max-height: 88vh; border-radius: 6px; }
+.lb-close {
+  position: fixed; top: 16px; right: 20px;
+  background: transparent; color: #fff; border: none; font-size: 28px; cursor: pointer;
+}
+.lb-nav {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: transparent; color: #fff; border: none; font-size: 42px; cursor: pointer;
+  padding: 0 12px;
+}
+.lb-nav.prev { left: 16px; }
+.lb-nav.next { right: 16px; }
+
+@media (max-width: 900px) {
+  .project-row { grid-template-columns: 1fr; gap: 1rem; }
+  .thumbs-row { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .thumb img { height: 100px; }
+}

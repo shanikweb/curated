@@ -20,8 +20,9 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
+        <div className="brand-mark" aria-hidden>👁️</div>
         <Link to="/" className="sidebar-title">Shanik Tanna</Link>
-        <div className="sidebar-sub">garden of curation</div>
+        <div className="sidebar-sub">Shelf</div>
         <nav className="nav">
           <Link to="/" className={location.pathname === "/" ? "active" : ""}>Books</Link>
           <Link to="/movies" className={location.pathname === "/movies" ? "active" : ""}>Movies</Link>
@@ -31,10 +32,9 @@ export default function Sidebar() {
           <Link to="/tabs" className={location.pathname === "/tabs" ? "active" : ""}>Tabs</Link>
         </nav>
         <div className="sidebar-footer">
-          <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle dark mode">
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          <button className="theme-icon" onClick={toggleTheme} aria-label="Toggle dark mode">
+            {theme === 'dark' ? '☀︎' : '☾'}
           </button>
-          <span>creative producer &amp; community builder</span>
         </div>
       </div>
     </aside>
