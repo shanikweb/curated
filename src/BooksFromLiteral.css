@@ -7,14 +7,22 @@
 
 /* chip styles moved to theme.css */
 
-/* Grid (unused for list view) */
-.books-grid { display: none; }
+/* Grid view */
+.books-grid {
+  display: grid;
+  /* ~90% of previous 165px column size */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  /* tightened gaps */
+  gap: 1.25rem 1rem;
+  align-items: start;
+  contain: layout paint;
+}
 
 /* List */
 .books-table { display: block; --row-pad: 1.2rem; --accent: color-mix(in srgb, var(--primary) 60%, var(--ink)); }
 .books-head {
   display: grid;
-  grid-template-columns: 40px 56px 1.4fr 1fr 90px 1fr;
+  grid-template-columns: 40px 56px 1.4fr 1fr 90px 1fr 120px;
   gap: 1rem;
   align-items: end;
   padding: .5rem 0 .6rem;
@@ -26,7 +34,7 @@
 .books-list { display: flex; flex-direction: column; }
 .book-row {
   display: grid;
-  grid-template-columns: 40px 56px 1.4fr 1fr 90px 1fr;
+  grid-template-columns: 40px 56px 1.4fr 1fr 90px 1fr 120px;
   align-items: center;
   gap: 1rem;
   padding: var(--row-pad) 0;
@@ -54,6 +62,7 @@
 .cell.authors { color: var(--muted); }
 .cell.year { text-align: right; color: var(--muted); }
 .cell.genre { color: var(--muted); }
+.cell.status { color: var(--muted); }
 
 .book-authors-inline { display: none; color: var(--muted); margin-left: .5rem; font-size: .95rem; }
 
@@ -88,6 +97,17 @@
 .book-link:hover .book-cover,
 .book-link:focus-visible .book-cover { transform: scale(1.02); }
 
+/* floating preview in list view */
+.book-preview {
+  position: fixed;
+  width: 120px;
+  height: auto;
+  pointer-events: none;
+  z-index: 60;
+  transition: opacity .15s ease;
+}
+.book-preview img { width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
+
 /* Removed text for grid; list styles above */
 
 .books-loading,
@@ -114,6 +134,7 @@
   .books-head { display: none; }
   .book-row { grid-template-columns: 48px 1fr; gap: .75rem; }
   .cell.authors, .cell.year, .cell.genre { display: none; }
+  .cell.status { display: none; }
   .book-authors-inline { display: inline-block; }
   .cell.idx { display: none; }
 }

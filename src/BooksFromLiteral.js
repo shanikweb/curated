@@ -15,7 +15,9 @@ export default function BooksFromLiteral() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("IS_READING"); // start on Currently Reading
+  const [viewMode, setViewMode] = useState("GRID"); // GRID | LIST
   const gridRef = useRef(null);
+  const [preview, setPreview] = useState({ show: false, src: "", x: 0, y: 0 });
 
   // No plugin registration needed; using plain GSAP for crossfades
 
@@ -121,15 +123,30 @@ export default function BooksFromLiteral() {
           { key: "IS_READING", label: STATUS_LABELS.IS_READING },
           { key: "FINISHED", label: STATUS_LABELS.FINISHED },
           { key: "WANTS_TO_READ", label: STATUS_LABELS.WANTS_TO_READ },
+          { key: "LIST", label: "List" },
         ].map(({ key, label }) => (
           <button
             key={key}
             role="tab"
-            aria-selected={filter === key}
-            className={`chip ${filter === key ? "active" : ""}`}
+            aria-selected={(viewMode === "LIST" ? key === "LIST" : filter === key)}
+            className={`chip ${(viewMode === "LIST" ? key === "LIST" : filter === key) ? "active" : ""}`}
             onClick={() => {
-              if (key === filter) return;
+              // If selecting List, switch view and fade container
+              if (key === 'LIST') {
+                if (viewMode === 'LIST') return;
+                const grid = gridRef.current;
+                if (!grid) { setViewMode('LIST'); return; }
+                gsap.killTweensOf(grid);
+                gsap.to(grid, { opacity: 0, y: 8, duration: 0.18, ease: 'power2.out', onComplete: () => {
+                  setViewMode('LIST');
+                  requestAnimationFrame(() => gsap.fromTo(grid, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.22 }));
+                }});
+                return;
+              }
+
+              // Otherwise ensure grid view and apply status filter
               const nextFilter = key;
+              if (viewMode !== 'GRID') setViewMode('GRID');
               const grid = gridRef.current;
               if (!grid) { setFilter(nextFilter); return; }
               // Cancel any in-flight tweens to avoid stacking animations
@@ -157,45 +174,87 @@ export default function BooksFromLiteral() {
           </button>
         ))}
       </div>
-      <div className="books-table" ref={gridRef}>
-        <div className="books-head">
-          <div className="cell idx">№</div>
-          <div className="cell thumb">Cover</div>
-          <div className="cell title">Title</div>
-          <div className="cell authors">Author</div>
-          <div className="cell year">Year</div>
-          <div className="cell genre">Genre</div>
+      {viewMode === 'LIST' ? (
+        <div className="books-table" ref={gridRef}>
+          <div className="books-head">
+            <div className="cell idx">№</div>
+            <div className="cell title">Title</div>
+            <div className="cell authors">Author</div>
+            <div className="cell year">Year</div>
+            <div className="cell genre">Genre</div>
+            <div className="cell status">Status</div>
+          </div>
+          <div className="books-list">
+            {(allBooks.length === 0) ? (
+              <div className="books-empty">No books found.</div>
+            ) : (
+              allBooks.map((book, i) => {
+                const authors = (book.authors || []).map(a => a.name).join(", ");
+                const year = book._year || "—";
+                const genre = (Array.isArray(book._genres) && book._genres.length) ? book._genres.join(', ') : "—";
+                const idx = String(i + 1).padStart(2, '0');
+                const statusLabel = STATUS_LABELS[book._status] || book._status || '—';
+                return (
+                  <a
+                    key={book.id}
+                    href={`https://literal.club/book/${book.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="book-row"
+                    title={book.title}
+                    onMouseEnter={(e)=> setPreview({ show: true, src: book.cover, x: e.clientX + 16, y: e.clientY + 16 })}
+                    onMouseMove={(e)=> setPreview(p => ({ ...p, x: e.clientX + 16, y: e.clientY + 16 }))}
+                    onMouseLeave={()=> setPreview(p => ({ ...p, show: false }))}
+                  >
+                    <div className="cell idx">{idx}</div>
+                    <div className="cell title"><span className="book-title">{book.title}</span><span className="book-authors-inline">{authors}</span></div>
+                    <div className="cell authors">{authors}</div>
+                    <div className="cell year">{year}</div>
+                    <div className="cell genre">{genre}</div>
+                    <div className="cell status">{statusLabel}</div>
+                  </a>
+                );
+              })
+            )}
+          </div>
         </div>
-        <div className="books-list">
-        {visibleBooks.length === 0 ? (
-          <div className="books-empty">No books in this filter.</div>
-        ) : (
-          visibleBooks.map((book, i) => {
-            const authors = (book.authors || []).map(a => a.name).join(", ");
-            const year = book._year || "—";
-            const genre = (Array.isArray(book._genres) && book._genres.length) ? book._genres.join(', ') : "—";
-            const idx = String(i + 1).padStart(2, '0');
-            return (
+      ) : (
+        <div className="books-grid" ref={gridRef}>
+          {(visibleBooks.length === 0) ? (
+            <div className="books-empty">No books in this filter.</div>
+          ) : (
+            visibleBooks.map((book) => (
               <a
                 key={book.id}
                 href={`https://literal.club/book/${book.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="book-row"
+                className="book-link"
                 title={book.title}
+                data-status={book._status}
               >
-                <div className="cell idx">{idx}</div>
-                <div className="cell thumb"><img src={book.cover} alt="" className="book-thumb" /></div>
-                <div className="cell title"><span className="book-title">{book.title}</span><span className="book-authors-inline">{authors}</span></div>
-                <div className="cell authors">{authors}</div>
-                <div className="cell year">{year}</div>
-                <div className="cell genre">{genre}</div>
+                <img src={book.cover} alt={book.title} className="book-cover" />
               </a>
-            );
-          })
-        )}
+            ))
+          )}
         </div>
-      </div>
+      )}
+
+      {/* floating preview for list view */}
+      {viewMode === 'LIST' && (
+        <div
+          className="book-preview"
+          style={{
+            left: preview.x,
+            top: preview.y,
+            opacity: preview.show ? 1 : 0,
+            transform: `translate(-5px, -5px)`
+          }}
+          aria-hidden="true"
+        >
+          {preview.src && <img src={preview.src} alt="" />}
+        </div>
+      )}
     </div>
   );
 }
