@@ -17,6 +17,7 @@ export default function BooksFromLiteral() {
   const [filter, setFilter] = useState("IS_READING"); // start on Currently Reading
   const [viewMode, setViewMode] = useState("GRID"); // GRID | LIST
   const gridRef = useRef(null);
+  const toolbarRef = useRef(null);
   const [preview, setPreview] = useState({ show: false, src: "", x: 0, y: 0 });
 
   // No plugin registration needed; using plain GSAP for crossfades
@@ -111,14 +112,35 @@ export default function BooksFromLiteral() {
     filter === "ALL" ? allBooks : allBooks.filter(b => b._status === filter)
   ), [allBooks, filter]);
 
+  // animate the moving underline under active chip (must be before early returns)
+  useEffect(() => {
+    const bar = toolbarRef.current;
+    if (!bar) return;
+    const ux = bar.querySelector('.chip-ux');
+    const active = bar.querySelector('.chip.active');
+    if (!ux || !active) return;
+    const update = () => {
+      const rect = active.getBoundingClientRect();
+      const parent = bar.getBoundingClientRect();
+      const left = rect.left - parent.left;
+      ux.style.width = rect.width + 'px';
+      ux.style.transform = `translateX(${left}px)`;
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [filter, viewMode]);
+
   // Remove previous scroll hint logic — simplified grid crossfade
 
   if (loading) return <div className="books-loading">Loading books...</div>;
   if (error) return <div className="books-error">{error}</div>;
 
+  
+
   return (
     <div className="books-page">
-      <div className="books-toolbar" role="tablist" aria-label="Filter books">
+      <div className="books-toolbar" role="tablist" aria-label="Filter books" ref={toolbarRef}>
         {[
           { key: "IS_READING", label: STATUS_LABELS.IS_READING },
           { key: "FINISHED", label: STATUS_LABELS.FINISHED },
@@ -173,15 +195,20 @@ export default function BooksFromLiteral() {
             {label}
           </button>
         ))}
+        <span className="chip-ux" aria-hidden="true" />
       </div>
       {viewMode === 'LIST' ? (
-        <div className="books-table" ref={gridRef}>
+        (() => {
+          const hasAnyYear = allBooks.some(b => !!b._year);
+          const hasAnyGenre = allBooks.some(b => Array.isArray(b._genres) && b._genres.length);
+          return (
+        <div className={`books-table ${hasAnyYear ? 'has-year' : ''} ${hasAnyGenre ? 'has-genre' : ''}`} ref={gridRef}>
           <div className="books-head">
             <div className="cell idx">№</div>
             <div className="cell title">Title</div>
             <div className="cell authors">Author</div>
-            <div className="cell year">Year</div>
-            <div className="cell genre">Genre</div>
+            {hasAnyYear && <div className="cell year">Year</div>}
+            {hasAnyGenre && <div className="cell genre">Genre</div>}
             <div className="cell status">Status</div>
           </div>
           <div className="books-list">
@@ -209,8 +236,8 @@ export default function BooksFromLiteral() {
                     <div className="cell idx">{idx}</div>
                     <div className="cell title"><span className="book-title">{book.title}</span><span className="book-authors-inline">{authors}</span></div>
                     <div className="cell authors">{authors}</div>
-                    <div className="cell year">{year}</div>
-                    <div className="cell genre">{genre}</div>
+                    {hasAnyYear && <div className="cell year">{year}</div>}
+                    {hasAnyGenre && <div className="cell genre">{genre}</div>}
                     <div className="cell status">{statusLabel}</div>
                   </a>
                 );
@@ -218,6 +245,8 @@ export default function BooksFromLiteral() {
             )}
           </div>
         </div>
+          );
+        })()
       ) : (
         <div className="books-grid" ref={gridRef}>
           {(visibleBooks.length === 0) ? (

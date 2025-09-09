@@ -3,7 +3,19 @@
 .books-page { max-width: var(--page-max-width); margin: 0 auto; padding: 0 2rem 2rem; }
 
 /* Toolbar */
-.books-toolbar { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.books-toolbar { position: relative; display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; padding-bottom: 4px; }
+.books-toolbar .chip-ux {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  background: var(--nav-accent);
+  border-radius: 2px;
+  opacity: .85;
+  transform: translateX(0);
+  transition: transform .25s ease, width .25s ease, opacity .25s ease;
+}
 
 /* chip styles moved to theme.css */
 
@@ -22,19 +34,22 @@
 .books-table { display: block; --row-pad: 1.2rem; --accent: color-mix(in srgb, var(--primary) 60%, var(--ink)); }
 .books-head {
   display: grid;
-  grid-template-columns: 40px 56px 1.4fr 1fr 90px 1fr 120px;
+  grid-template-columns: 40px 2fr 1.2fr 120px; /* default when no year/genre */
   gap: 1rem;
   align-items: end;
   padding: .5rem 0 .6rem;
   border-bottom: 2px solid var(--divider);
   position: sticky; top: calc(var(--header-h) + 8px); background: var(--bg);
 }
+.books-table.has-year .books-head { grid-template-columns: 40px 1.8fr 1.1fr 90px 120px; }
+.books-table.has-genre .books-head { grid-template-columns: 40px 1.8fr 1.1fr 1fr 120px; }
+.books-table.has-year.has-genre .books-head { grid-template-columns: 40px 1.6fr 1.1fr 90px 1fr 120px; }
 .books-head .cell { font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
 
 .books-list { display: flex; flex-direction: column; }
 .book-row {
   display: grid;
-  grid-template-columns: 40px 56px 1.4fr 1fr 90px 1fr 120px;
+  grid-template-columns: 40px 2fr 1.2fr 120px; /* default */
   align-items: center;
   gap: 1rem;
   padding: var(--row-pad) 0;
@@ -42,6 +57,9 @@
   text-decoration: none;
   border-top: 1px solid color-mix(in srgb, var(--divider) 85%, transparent);
 }
+.books-table.has-year .book-row { grid-template-columns: 40px 1.8fr 1.1fr 90px 120px; }
+.books-table.has-genre .book-row { grid-template-columns: 40px 1.8fr 1.1fr 1fr 120px; }
+.books-table.has-year.has-genre .book-row { grid-template-columns: 40px 1.6fr 1.1fr 90px 1fr 120px; }
 .book-row:first-child { border-top: none; }
 .book-row:nth-child(odd) { background: rgba(0,0,0,0.008); }
 [data-theme="dark"] .book-row:nth-child(odd) { background: rgba(255,255,255,0.012); }
@@ -57,7 +75,8 @@
   background: transparent;
 }
 .book-title { font-weight: 600; }
-.book-title { letter-spacing: .005em; font-size: 1rem; }
+.cell.title { min-width: 0; }
+.book-title { letter-spacing: .005em; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cell.idx { color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .cell.authors { color: var(--muted); }
 .cell.year { text-align: right; color: var(--muted); }

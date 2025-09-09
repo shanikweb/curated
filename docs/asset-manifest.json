@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/curated/static/css/main.c263cfa3.css",
-    "main.js": "/curated/static/js/main.31ba68c6.js",
+    "main.css": "/curated/static/css/main.2572d920.css",
+    "main.js": "/curated/static/js/main.60e99a8b.js",
     "static/js/453.29f8aeb0.chunk.js": "/curated/static/js/453.29f8aeb0.chunk.js",
     "static/media/NeueMontreal-Bold.otf": "/curated/static/media/NeueMontreal-Bold.a554760220833fcd4ee5.otf",
     "static/media/NeueMontreal-Medium.otf": "/curated/static/media/NeueMontreal-Medium.b8bc39987e00659a8791.otf",
     "static/media/NeueMontreal-Light.otf": "/curated/static/media/NeueMontreal-Light.5120d70da9b588d02e72.otf",
     "static/media/NeueMontreal-Regular.otf": "/curated/static/media/NeueMontreal-Regular.17e21dd57858de06e544.otf",
     "index.html": "/curated/index.html",
-    "main.c263cfa3.css.map": "/curated/static/css/main.c263cfa3.css.map",
-    "main.31ba68c6.js.map": "/curated/static/js/main.31ba68c6.js.map",
+    "main.2572d920.css.map": "/curated/static/css/main.2572d920.css.map",
+    "main.60e99a8b.js.map": "/curated/static/js/main.60e99a8b.js.map",
     "453.29f8aeb0.chunk.js.map": "/curated/static/js/453.29f8aeb0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c263cfa3.css",
-    "static/js/main.31ba68c6.js"
+    "static/css/main.2572d920.css",
+    "static/js/main.60e99a8b.js"
   ]
 }

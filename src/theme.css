@@ -1,5 +1,5 @@
 :root {
-  --page-max-width: 1180px;
+  --page-max-width: 1440px;
   --bg: #FFFCF5; /* light default */
   --ink: #222;
   --muted: #555;
@@ -63,18 +63,17 @@ body {
 /* Global tag style */
 .chip {
   appearance: none;
-  border: 1px solid var(--chip-border);
-  background: var(--chip-bg);
-  color: var(--chip-fg);
-  padding: 6px 10px;
-  border-radius: 6px; /* rectangular feel */
-  font-size: 0.88rem;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 4px 6px 4px 0;
+  border-radius: 0;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
+  transition: color .15s ease, transform .1s ease;
 }
-.chip:hover { border-color: var(--divider); }
-.chip.active { background: #3a3a3c; border-color: #3a3a3c; color: #fff; }
-[data-theme="dark"] .chip { background: #2b2b2e; border-color: #38383b; color: #ddd; }
+.chip:hover { color: var(--ink); }
+.chip.active { color: var(--nav-accent); }
 /* Neue Montreal font faces (add files to public/fonts) */
 @font-face {
   font-family: 'Neue Montreal';
@@ -104,5 +103,5 @@ body {
   font-style: normal;
   font-display: swap;
 }
-[data-theme="dark"] .chip.active { background: #f1f1f2; color: #181818; border-color: #f1f1f2; }
+.chip:active { transform: translateY(1px); }
 .chip:active { transform: translateY(1px); }
